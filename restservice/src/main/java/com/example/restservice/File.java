@@ -7,7 +7,8 @@ public class File {
   public String fileContent;
   public String fileCreatedDate;
 
-  File() {}
+  File() {
+  }
 
   File(String fileName, String fileContent) {
     this.fileName = fileName;

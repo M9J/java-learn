@@ -6,8 +6,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class FileController {
+
   private List<File> files = new ArrayList<File>();
 
   @GetMapping("/file")
@@ -32,11 +35,52 @@ public class FileController {
     return newFile;
   }
 
+  @PutMapping("/file")
+  public String updateFile(@RequestParam(value = "fileId") int fileId, @RequestBody File file) {
+    String updateStatus = "Not updated";
+    if (fileId > 0) {
+      for (File tempFile : this.files) {
+        if (tempFile.fileId == fileId) {
+          if (tempFile.fileName != file.fileName) {
+            tempFile.fileName = file.fileName;
+            updateStatus = "Updated successfully";
+          }
+          if (tempFile.fileContent != file.fileContent) {
+            tempFile.fileContent = file.fileContent;
+            updateStatus = "Updated successfully";
+          }
+        }
+      }
+    }
+    return updateStatus;
+  }
+
+  @DeleteMapping("/file")
+  public String deleteFile(@RequestParam(value="fileId") int fileId) {
+    String deleteStatus = "Not deleted";
+    if (fileId > 0) {
+      int i = 0;
+      int toBeDeletedIndex = -1;
+      for (File tempFile:this.files) {
+        if (tempFile.fileId == fileId) {
+          toBeDeletedIndex = i;
+          break;
+        }
+        i++;
+      }
+      if (toBeDeletedIndex > -1) {
+        this.files.remove(toBeDeletedIndex);
+        deleteStatus = "Deleted successfully";
+      }
+    }
+    return deleteStatus;
+  }
+
   @GetMapping("/file/dummy/create")
   public int fileDummyCreate() {
-    this.files.add(new File("Dropbox.pdf", "encoded pdf"));
-    this.files.add(new File("Cutecat.png", "meow may be?"));
-    this.files.add(new File("Diary-2JUL2022.txt", "encrypted for no reason"));
+    this.addFile(new File("Dropbox", "encoded pdf"));
+    this.addFile(new File("Cutecat", "meow may be?"));
+    this.addFile(new File("Diary-2JUL2022", "encrypted for no reason"));
     return this.files.size();
   }
 
